@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatientCare - Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="logo">
+            <span class="logo-icon">✚</span>
+            Patient<span>Care</span>
+        </div>
+
+        <p class="menu-title">MAIN MENU</p>
+
+        <nav>
+            <a href="#" class="nav-link active" data-page="dashboard">▦ Dashboard</a>
+            <a href="#" class="nav-link" data-page="patients">♙ Patient Records</a>
+            <a href="#" class="nav-link" data-page="add-patient">⊕ Add Patient</a>
+            <a href="#" class="nav-link" data-page="appointments">▣ Appointments</a>
+            <a href="#" class="nav-link" data-page="reports">▤ Reports</a>
+        </nav>
+
+        <p class="menu-title settings-title">PREFERENCES</p>
+
+        <nav>
+            <a href="#" class="nav-link" data-page="settings">⚙ Settings</a>
+        </nav>
+
+        <div class="sidebar-profile">
+            <div class="avatar">A</div>
+            <div>
+                <h4>Administrator</h4>
+                <p>Hospital Admin</p>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <header class="header">
+
+            <div class="header-left">
+                <button id="menuToggle">☰</button>
+                <div>
+                    <h2 id="pageTitle">Dashboard</h2>
+                    <p>Patient Records Management System</p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <span id="currentDate"></span>
+                <div class="avatar">A</div>
+            </div>
+
+        </header>
+
+        <!-- DASHBOARD -->
+        <section class="page active" id="dashboard">
+
+            <div class="welcome">
+                <div>
+                    <h1>Welcome Back, Admin! 👋</h1>
+                    <p>Manage your hospital patient records efficiently.</p>
+                </div>
+
+                <button class="btn-primary" onclick="showPage('add-patient')">
+                    + Add New Patient
+                </button>
+            </div>
+
+            <!-- STAT CARDS -->
+            <div class="stats">
+
+                <div class="stat-card blue">
+                    <div class="stat-icon">♙</div>
+                    <p>Total Patients</p>
+                    <h2 id="totalPatients">0</h2>
+                    <small>Registered patients</small>
+                </div>
+
+                <div class="stat-card green">
+                    <div class="stat-icon">♂</div>
+                    <p>Male Patients</p>
+                    <h2 id="malePatients">0</h2>
+                    <small>Male registrations</small>
+                </div>
+
+                <div class="stat-card purple">
+                    <div class="stat-icon">♀</div>
+                    <p>Female Patients</p>
+                    <h2 id="femalePatients">0</h2>
+                    <small>Female registrations</small>
+                </div>
+
+                <div class="stat-card orange">
+                    <div class="stat-icon">▣</div>
+                    <p>Appointments</p>
+                    <h2 id="appointmentCount">0</h2>
+                    <small>Upcoming appointments</small>
+                </div>
+
+            </div>
+
+            <!-- CHART AND SUMMARY -->
+            <div class="dashboard-grid">
+
+                <div class="card">
+                    <h3>Patient Gender Overview</h3>
+                    <p class="subtitle">Patient distribution</p>
+                    <div class="chart-box">
+                        <canvas id="genderChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Patient Summary</h3>
+                    <p class="subtitle">Registration statistics</p>
+
+                    <div class="summary-row">
+                        <span>Male Patients</span>
+                        <strong id="summaryMale">0</strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Female Patients</span>
+                        <strong id="summaryFemale">0</strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Other Patients</span>
+                        <strong id="summaryOther">0</strong>
+                    </div>
+
+                    <div class="summary-total">
+                        <span>Total Patients</span>
+                        <strong id="summaryTotal">0</strong>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RECENT PATIENTS -->
+            <div class="card">
+                <div class="card-heading">
+                    <div>
+                        <h3>Recent Patients</h3>
+                        <p class="subtitle">Recently registered patients</p>
+                    </div>
+
+                    <button class="btn-outline" onclick="showPage('patients')">
+                        View All →
+                    </button>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient ID</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Phone</th>
+                                <th>Appointment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentTable"></tbody>
+                    </table>
+                </div>
+
+                <p id="recentEmpty" class="empty">No patient records found.</p>
+            </div>
+
+        </section>
+
+        <!-- PATIENT RECORDS -->
+        <section class="page" id="patients">
+
+            <div class="page-heading">
+                <div>
+                    <h2>Patient Records</h2>
+                    <p>View, search, update and delete patient records.</p>
+                </div>
+
+                <button class="btn-primary" onclick="showPage('add-patient')">
+                    + Add Patient
+                </button>
+            </div>
+
+            <div class="card">
+
+                <div class="toolbar">
+                    <input type="search" id="searchInput"
+                           placeholder="Search by patient name or ID...">
+
+                    <button class="btn-export" onclick="exportCSV()">
+                        ↓ Export CSV
+                    </button>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient ID</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Phone</th>
+                                <th>Appointment</th>
+                                <th>Blood Group</th>
+                                <th>Diagnosis</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientTable"></tbody>
+                    </table>
+                </div>
+
+                <p id="emptyMessage" class="empty">
+                    No patient records found.
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- ADD / EDIT PATIENT -->
+        <section class="page" id="add-patient">
+
+            <div class="page-heading">
+                <div>
+                    <h2 id="formTitle">Add New Patient</h2>
+                    <p>Enter patient information below.</p>
+                </div>
+            </div>
+
+            <div class="card form-card">
+
+                <form id="patientForm">
+
+                    <input type="hidden" id="patientId">
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>Patient Name *</label>
+                            <input type="text" id="name"
+                                   placeholder="Enter patient name"
+                                   maxlength="100" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Age *</label>
+                            <input type="number" id="age"
+                                   placeholder="Enter age"
+                                   min="0" max="120" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gender *</label>
+                            <select id="gender" required>
+                                <option value="">Select Gender</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number *</label>
+                            <input type="tel" id="phone"
+                                   placeholder="10-digit phone number"
+                                   pattern="[0-9]{10}"
+                                   maxlength="10" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Appointment Date *</label>
+                            <input type="date" id="date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Blood Group *</label>
+                            <select id="blood" required>
+                                <option value="">Select Blood Group</option>
+                                <option>A+</option>
+                                <option>A-</option>
+                                <option>B+</option>
+                                <option>B-</option>
+                                <option>O+</option>
+                                <option>O-</option>
+                                <option>AB+</option>
+                                <option>AB-</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full">
+                            <label>Diagnosis *</label>
+                            <input type="text" id="diagnosis"
+                                   placeholder="Enter diagnosis"
+                                   maxlength="200" required>
+                        </div>
+
+                        <div class="form-group full">
+                            <label>Additional Notes</label>
+                            <textarea id="notes" rows="4"
+                                      placeholder="Enter additional notes"
+                                      maxlength="2000"></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" id="submitBtn">
+                            Save Patient
+                        </button>
+
+                        <button type="reset" class="btn-reset" id="resetBtn">
+                            Clear
+                        </button>
+
+                        <button type="button" class="btn-cancel"
+                                onclick="cancelForm()">
+                            Cancel
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+        <!-- APPOINTMENTS -->
+        <section class="page" id="appointments">
+
+            <div class="page-heading">
+                <div>
+                    <h2>Appointments</h2>
+                    <p>View patient appointment details.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient ID</th>
+                                <th>Patient Name</th>
+                                <th>Phone</th>
+                                <th>Date</th>
+                                <th>Diagnosis</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appointmentTable"></tbody>
+                    </table>
+                </div>
+
+                <p class="empty" id="appointmentEmpty">
+                    No appointments found.
+                </p>
+            </div>
+
+        </section>
+
+        <!-- REPORTS -->
+        <section class="page" id="reports">
+
+            <div class="page-heading">
+                <div>
+                    <h2>Reports & Analytics</h2>
+                    <p>Patient registration statistics.</p>
+                </div>
+
+                <button class="btn-export" onclick="exportCSV()">
+                    ↓ Download CSV
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card blue">
+                    <p>Total Patients</p>
+                    <h2 id="reportTotal">0</h2>
+                </div>
+
+                <div class="stat-card green">
+                    <p>Male Patients</p>
+                    <h2 id="reportMale">0</h2>
+                </div>
+
+                <div class="stat-card purple">
+                    <p>Female Patients</p>
+                    <h2 id="reportFemale">0</h2>
+                </div>
+
+                <div class="stat-card orange">
+                    <p>Other Patients</p>
+                    <h2 id="reportOther">0</h2>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Registration Summary</h3>
+                <div id="reportSummary" class="report-summary"></div>
+            </div>
+
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="page" id="settings">
+
+            <div class="page-heading">
+                <div>
+                    <h2>Settings</h2>
+                    <p>System information and preferences.</p>
+                </div>
+            </div>
+
+            <div class="card settings-card">
+                <h3>System Information</h3>
+
+                <div class="form-group">
+                    <label>Application Name</label>
+                    <input value="PatientCare" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Version</label>
+                    <input value="1.0" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Storage</label>
+                    <input value="Browser Local Storage - Demo" disabled>
+                </div>
+
+                <p class="subtitle">
+                    This is a frontend demonstration, not a secure
+                    medical records platform.
+                </p>
+            </div>
+
+        </section>
+
+        <footer>
+            © 2026 PatientCare | Patient Management System
+        </footer>
+
+    </main>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
